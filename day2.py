@@ -1,35 +1,31 @@
 import textwrap
-from itertools import groupby
 
-file1 = open("day2.txt", "r")
-line = file1.readline()
-
-ranges = line.split(",")
+# read file and extract data
+with open("day2.txt", "r") as f:
+    ranges = f.readline().split(",")
 
 
-def all_equal(iterable):
-    g = groupby(iterable)
-    return next(g, True) and not next(g, False)
-
-
-def is_invalid(id):
-    if len(id) % 2 == 1:
-        half_length = int((len(id) - 1) / 2)
-    half_length = int(len(id) / 2)
+# function to check if an id is valid
+def is_valid(id):
+    half_length = len(id) // 2
 
     for i in range(1, half_length + 1):
-        if len(id) % i == 0:
-            numbers = textwrap.wrap(id, i)
-            if all_equal(numbers):
-                return False
-    return True
+        if len(id) % i:
+            continue
+        # slice id into equal sized numbers
+        numbers = list(textwrap.wrap(id, i))
+        # check if all slices are equal
+        if all(x == numbers[0] for x in numbers):
+            return True
+    return False
 
 
+# count the valid ids
 counter = 0
 for interval in ranges:
-    bounds = list(map(int, interval.split("-")))
-    for id in range(bounds[0], bounds[1] + 1):
-        if not is_invalid(str(id)):
+    start, end = map(int, interval.split("-"))
+    for id in range(start, end + 1):
+        if is_valid(str(id)):
             counter += id
 
 print(counter)
