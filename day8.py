@@ -1,38 +1,26 @@
-import numpy as np
+import math
+from itertools import combinations
 
-file1 = open("day8.txt", "r")
-points = []
-for line in file1.readlines():
-    point = list(map(int, line.strip().split(",")))
-    points.append(point)
+# read and parse data
+with open("day8.txt", "r") as f:
+    points = [list(map(int, line.split(","))) for line in f.read().splitlines()]
 
-dist = {}
-for a in points:
-    for b in points:
-        if a == b:
-            pass
-        elif (tuple(b), tuple(a)) in dist:
-            pass
-        else:
-            dist[(tuple(a), tuple(b))] = np.sqrt(
-                (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2
-            )
-
+# calculate and sort all the distances
+dist = {(tuple(a), tuple(b)): math.dist(a, b) for a, b in combinations(points, 2)}
 sorted_dist = dict(sorted(dist.items(), key=lambda item: item[1], reverse=True))
+
+# initialize
 circuts = [{tuple(p)} for p in points]
 
+# merge circuts until there is only one left
 while len(circuts) > 1:
-    numbers = sorted_dist.popitem()[0]
-    inersection = []
+    point = sorted_dist.popitem()[0]
     # count number of intersecting circuts
-    for j in range(len(circuts)):
-        if set.intersection(set(numbers), circuts[j]):
-            inersection.append(circuts[j])
-    if len(inersection) == 2:
+    intersection = [c for c in circuts if set(point) & c]
+    if len(intersection) == 2:
         # We need to join two circuts
-        circuts.append(set.union(inersection[0], inersection[1]))
-        circuts.remove(inersection[0])
-        circuts.remove(inersection[1])
+        circuts.append(intersection[0] | intersection[1])
+        circuts.remove(intersection[0])
+        circuts.remove(intersection[1])
 
-wall_dist = numbers[0][0] * numbers[1][0]
-print(wall_dist)
+print(point[0][0] * point[1][0])
