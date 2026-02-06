@@ -1,5 +1,6 @@
-file1 = open("day1.txt", "r")
-lines = file1.readlines()
+# read file and extract data
+with open("day1.txt", "r") as f:
+    lines = f.read().splitlines()
 
 i = 50
 password_counter = 0
@@ -18,4 +19,3 @@ for line in lines:
         i = (i + val) % 100
 
 print(password_counter)
-file1.close()
