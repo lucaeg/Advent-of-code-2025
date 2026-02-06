@@ -1,130 +1,43 @@
-import numpy as np
+# read data
+with open("day4.txt", "r") as f:
+    lines = f.read().splitlines()
+    input = [list(line) for line in lines]
 
-file = open("day4.txt", "r")
+line_number = len(input)
+char_number = len(input[0])
 
-input_raw = file.readlines()
-line_number = len(input_raw)
-char_number = len(input_raw[0].strip("\n"))
 
-input = np.zeros((line_number, char_number), dtype=str)
-for i in range(line_number):
-    for j in range(char_number):
-        input[i][j] = input_raw[i][j]
+# function to count the number of neighbors equal to '@'
+def count_neighbors(input, i, j):
+    nb_count = 0
+    for dr in (-1, 0, 1):
+        for dc in (-1, 0, 1):
+            if dr == 0 and dc == 0:
+                continue
+            nr, nc = i + dr, j + dc
+            if 0 <= nr < line_number and 0 <= nc < char_number:
+                if input[nr][nc] == "@":
+                    nb_count += 1
+    return nb_count
 
-count = 0
-grid_count = 1  # initialize
 
-while grid_count != 0:
-    grid_count = 0
-    # Check midle grid
-    for i in range(1, line_number - 1):
-        for j in range(1, char_number - 1):
-            cell_count = 0
+# count the total number of removable "@"
+# we do this by repeatedly removing any removable "@" cells
+# until no more can be removed
+total_count = 0
+removed_count = 1  # initialize
+
+while removed_count != 0:
+    removed_count = 0
+    for i in range(line_number):
+        for j in range(char_number):
             cell = input[i][j]
             if cell == ".":
-                cell_count += 4
-            if input[i - 1][j] == "@":
-                cell_count += 1
-            if input[i + 1][j] == "@":
-                cell_count += 1
-            if input[i][j - 1] == "@":
-                cell_count += 1
-            if input[i][j + 1] == "@":
-                cell_count += 1
-            if input[i - 1][j - 1] == "@":
-                cell_count += 1
-            if input[i - 1][j + 1] == "@":
-                cell_count += 1
-            if input[i + 1][j - 1] == "@":
-                cell_count += 1
-            if input[i + 1][j + 1] == "@":
-                cell_count += 1
-            if cell_count < 4:
-                grid_count += 1
+                continue
+            elif count_neighbors(input, i, j) < 4:
+                # condition for removing is valid
                 input[i][j] = "."
+                removed_count += 1
+    total_count += removed_count
 
-    i = 0
-    for j in range(1, char_number - 1):
-        cell_count = 0
-        cell = input[i][j]
-        if cell == ".":
-            cell_count += 4
-        if input[i + 1][j] == "@":
-            cell_count += 1
-        if input[i][j - 1] == "@":
-            cell_count += 1
-        if input[i][j + 1] == "@":
-            cell_count += 1
-        if input[i + 1][j - 1] == "@":
-            cell_count += 1
-        if input[i + 1][j + 1] == "@":
-            cell_count += 1
-        if cell_count < 4:
-            grid_count += 1
-            input[i][j] = "."
-    i = line_number - 1
-    for j in range(1, char_number - 1):
-        cell_count = 0
-        cell = input[i][j]
-        if cell == ".":
-            cell_count += 4
-        if input[i - 1][j] == "@":
-            cell_count += 1
-        if input[i][j - 1] == "@":
-            cell_count += 1
-        if input[i][j + 1] == "@":
-            cell_count += 1
-        if input[i - 1][j - 1] == "@":
-            cell_count += 1
-        if input[i - 1][j + 1] == "@":
-            cell_count += 1
-        if cell_count < 4:
-            grid_count += 1
-            input[i][j] = "."
-
-    j = 0
-    for i in range(1, line_number - 1):
-        cell_count = 0
-        cell = input[i][j]
-        if cell == ".":
-            cell_count += 4
-        if input[i - 1][j] == "@":
-            cell_count += 1
-        if input[i + 1][j] == "@":
-            cell_count += 1
-        if input[i][j + 1] == "@":
-            cell_count += 1
-        if input[i - 1][j + 1] == "@":
-            cell_count += 1
-        if input[i + 1][j + 1] == "@":
-            cell_count += 1
-        if cell_count < 4:
-            grid_count += 1
-            input[i][j] = "."
-
-    j = char_number - 1
-    for i in range(1, line_number - 1):
-        cell_count = 0
-        cell = input[i][j]
-        if cell == ".":
-            cell_count += 4
-        if input[i - 1][j] == "@":
-            cell_count += 1
-        if input[i + 1][j] == "@":
-            cell_count += 1
-        if input[i][j - 1] == "@":
-            cell_count += 1
-        if input[i - 1][j - 1] == "@":
-            cell_count += 1
-        if input[i + 1][j - 1] == "@":
-            cell_count += 1
-        if cell_count < 4:
-            grid_count += 1
-            input[i][j] = "."
-
-    count += grid_count
-
-corner = 1
-count += corner
-
-print(count)
+print(total_count)
