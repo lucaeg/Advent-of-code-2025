@@ -1,36 +1,33 @@
-file1 = open("day5.txt", "r")
-lines = file1.readlines()
-
 intervals = []
 numbers = []
 
-for line in lines:
-    try:
-        number = int(line.strip())
-        numbers.append(number)
-    except ValueError:
-        if line.strip():
-            interval = list(map(int, line.strip().split("-")))
-            intervals.append(interval)
-
+# read and parse data
+with open("day5.txt", "r") as f:
+    for line in f.read().splitlines():
+        if not line:
+            continue
+        try:
+            numbers.append(int(line))
+        except ValueError:
+            intervals.append(list(map(int, line.split("-"))))
 
 intervals.sort()
 
 # Initial case
-lower = intervals[0][0]
-upper = intervals[0][1]
-fresh = intervals[0][1] - intervals[0][0] + 1
+lower_bound = intervals[0][0]
+upper_bound = intervals[0][1]
+total_numbers = intervals[0][1] - intervals[0][0] + 1
 
-# Looping
+# find total amount of numbers covered by the intervals
 for interval in intervals[1:]:
-    if interval[0] <= upper:
-        if interval[1] <= upper:
+    if interval[0] <= upper_bound:
+        if interval[1] <= upper_bound:
             continue
         else:
-            fresh += interval[1] - upper
-            upper = interval[1]
+            total_numbers += interval[1] - upper_bound
+            upper_bound = interval[1]
     else:
-        fresh += interval[1] - interval[0] + 1
-        upper = interval[1]
+        total_numbers += interval[1] - interval[0] + 1
+        upper_bound = interval[1]
 
-print(fresh)
+print(total_numbers)
